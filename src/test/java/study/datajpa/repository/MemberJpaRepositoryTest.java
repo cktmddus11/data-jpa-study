@@ -9,6 +9,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.entity.Member;
 
+import java.util.List;
+
 
 @Transactional // 테스트 기본 롤백
 @Rollback(false)
@@ -31,8 +33,23 @@ class MemberJpaRepositoryTest {
                 .isEqualTo(member.getUsername());
 
         Assertions.assertThat(findMember).isEqualTo(member); // 영속성 컨텍스트 저장 object => 인스턴스동일성 보장
-                                                                // 동일한 트랜젝션내에 동일한 영속성 컨텍스트 공유
+        // 동일한 트랜젝션내에 동일한 영속성 컨텍스트 공유
     }
 
 
+    @Test
+    void findByUsernameAndAgeGreaterThen() {
+        Member member = new Member("memberA", 10);
+        Member member2 = new Member("memberA", 5);
+        Member member3 = new Member("memberA", 5);
+
+        memberJpaRepository.save(member2);
+        memberJpaRepository.save(member);
+        memberJpaRepository.save(member3);
+
+        List<Member> memberList = memberJpaRepository.findByUsernameAndAgeGreaterThen("memberA", 5);
+        for(Member m : memberList){
+            System.out.println("member = "+m);
+        }
+    }
 }

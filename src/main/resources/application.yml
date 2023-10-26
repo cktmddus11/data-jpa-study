@@ -10,8 +10,9 @@ spring:
       ddl-auto: create # 애플리케이션 실행시점에 drop 후 테이블 재생성, 서버내려가도 테이블 삭제되지않음.
       properties:
         hibernate:
-          # show_sql: true
-          format_sql: true  # 쿼리 정렬
+         # show_sql: true
+         # format_sql: true  # 쿼리 정렬
 logging.level:
   org.hibernate.SQL: debug
  # org.hibernate.type: trace   # 파라미터 바인딩
+  org.hibernate.orm.jdbc.bind: trace # 위 설정 적용안되서 바꿈.

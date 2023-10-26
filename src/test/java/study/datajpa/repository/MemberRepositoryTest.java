@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import study.datajpa.dto.MemberDto;
+import study.datajpa.entity.Address;
 import study.datajpa.entity.Member;
+import study.datajpa.entity.Team;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @Rollback(false)
@@ -20,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired TeamRepository teamRepository;
 
     @Test
     public void testMemer() {
@@ -63,5 +67,183 @@ class MemberRepositoryTest {
         memberRepository.delete(member2);
         long deletedCount = memberRepository.count();
         Assertions.assertThat(deletedCount).isEqualTo(0);
+    }
+
+    @Test
+    void findByUsernameAndAgeGreaterThen() {
+        Member member = new Member("memberA", 10);
+        Member member2 = new Member("memberA", 5);
+        Member member3 = new Member("memberA", 5);
+
+        memberRepository.save(member2);
+        memberRepository.save(member);
+        memberRepository.save(member3);
+
+
+        List<Member> memberList = memberRepository.findByUsernameAndAgeGreaterThan("memberA", 2);
+        for(Member m : memberList){
+            System.out.println("member = "+m);
+        }
+    }
+
+    @Test
+    void countByUsernameAndAgeGreaterThen() {
+        Member member = new Member("memberA", 10);
+        Member member2 = new Member("memberA", 5);
+        Member member3 = new Member("memberA", 5);
+
+        memberRepository.save(member2);
+        memberRepository.save(member);
+        memberRepository.save(member3);
+
+        long memberCount = memberRepository.countByUsernameAndAgeGreaterThan("memberA", 2);
+        System.out.println("memberCount = "+memberCount);
+    }
+
+    @Test
+    void findByUsernameContaining() {
+        Member member = new Member("memberA", 10);
+        Member member2 = new Member("memberA", 5);
+        Member member3 = new Member("memberA", 5);
+
+        memberRepository.save(member2);
+        memberRepository.save(member);
+        memberRepository.save(member3);
+
+        List<Member> memberList = memberRepository.findByUsernameContaining("memberA");
+        for(Member m : memberList){
+            System.out.println("member = "+m);
+        }
+    }
+
+    @Test
+    void findTestMemberByUsername() {
+        Member member = new Member("memberA", 10);
+        Member member2 = new Member("memberB", 5);
+        Member member3 = new Member("memberC", 5);
+
+        memberRepository.save(member2);
+        memberRepository.save(member);
+        memberRepository.save(member3);
+
+        List<Member> memberList = memberRepository.findTestMemberByUsername("memberA");
+        for(Member m : memberList){
+            System.out.println("member = "+m);
+        }
+
+    }
+
+    @Test
+    void findUser() {
+        Member member = new Member("memberA", 3);
+        Member member2 = new Member("memberB", 5);
+
+
+        memberRepository.save(member);
+        memberRepository.save(member2);
+
+        List<Member> memberList = memberRepository.findUser("memberA", 3);
+        for(Member m : memberList){
+            System.out.println("member = "+m);
+        }
+
+    }
+
+    @Test
+    void findMemberUserName() {
+
+        Member member = new Member("memberA", 3);
+        Member member2 = new Member("memberB", 5);
+
+        memberRepository.save(member);
+        memberRepository.save(member2);
+
+        List<String> userNameList = memberRepository.findMemberUserName();
+        for(String username : userNameList){
+            System.out.println("username = "+username);
+        }
+    }
+
+    @Test
+    void findMemberByAddressCity() {
+        Address memberAddress = new Address("주소1", "서울", "길", "우편번호");
+        Address member2Address = new Address("주소1", "부산", "길", "우편번호");
+        Address member3Address = new Address("주소1", "서울", "길", "우편번호");
+
+
+        Member member = new Member("memberA", 3, memberAddress);
+        Member member2 = new Member("memberB", 5, member2Address);
+        Member member3 = new Member("memberC", 5, member3Address);
+
+
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+
+
+        List<Member> memberList = memberRepository.findMemberByAddressCity("서울");
+        for(Member m : memberList){
+            System.out.println("member = "+m);
+        }
+    }
+
+    @Test
+    void findMemberDto() {
+        Team team = new Team("팀1");
+        Team team2 = new Team("팀2");
+
+        teamRepository.save(team);
+        teamRepository.save(team2);
+
+        Member member = new Member("memberA", 3, team);
+        Member member2 = new Member("memberB", 5, team2);
+
+        memberRepository.save(member);
+        memberRepository.save(member2);
+
+        List<MemberDto> memberList = memberRepository.findMemberDto();
+        for(MemberDto m : memberList){
+            System.out.println("member = "+m);
+        }
+    }
+
+    @Test
+    void findMemberByAddressCity2() {
+        Address memberAddress = new Address("주소1", "서울", "길", "우편번호");
+        Address member2Address = new Address("주소1", "부산", "길", "우편번호");
+        Address member3Address = new Address("주소1", "서울", "길", "우편번호");
+
+
+        Member member = new Member("memberA", 3, memberAddress);
+        Member member2 = new Member("memberB", 5, member2Address);
+        Member member3 = new Member("memberC", 5, member3Address);
+        
+        
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+
+        List<Member> memberList = memberRepository.findMemberByAddressCity2("서울", 3);
+        for(Member m : memberList){
+            System.out.println("member = "+m);
+        }
+    }
+
+    @Test
+    void findMembeByUsernameList() {
+        Member member = new Member("memberA", 3);
+        Member member2 = new Member("memberB", 5);
+        Member member3 = new Member("memberC", 5);
+
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+
+
+        List<String> usernameList = Arrays.asList("memberA", "memberC");
+        List<Member> memberList = memberRepository.findMembeByUsernameList(usernameList);
+        for(Member m : memberList){
+            System.out.println("member = "+m);
+        }
     }
 }

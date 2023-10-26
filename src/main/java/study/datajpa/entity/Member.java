@@ -4,10 +4,14 @@ package study.datajpa.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본생성자 필수 필요. private  X, proxy 관련때문에
 @Entity
+@NamedQuery(
+        name="Member.findByUsername",
+        query="select m from Member m where m.username = :username"
+)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본생성자 필수 필요. private  X, proxy 관련때문에
 @Getter @Setter  // setter는 만들지 말자
-@ToString(of ={"id", "username", "age"}) // team 쓰면안됨.. 연관관계필드는 출력 주의
+@ToString(of ={"id", "username", "age", "address"}) // team 쓰면안됨.. 연관관계필드는 출력 주의
 public class Member {
 
     @Id
@@ -18,6 +22,9 @@ public class Member {
     private int age;
 
     private String username;
+
+    @Embedded
+    private Address address;
 
 
     @ManyToOne  // (fetch = FetchType.LAZY)
@@ -34,6 +41,17 @@ public class Member {
         if(team != null){
             changeTeam(team);
         }
+    }
+
+    public Member( String username,int age) {
+        this.age = age;
+        this.username = username;
+    }
+
+    public Member(String username, int age, Address address) {
+        this.age = age;
+        this.username = username;
+        this.address = address;
     }
 
     public void changeTeam(Team team){
