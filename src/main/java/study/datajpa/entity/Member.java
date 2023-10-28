@@ -5,10 +5,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@NamedQuery(
+/*@NamedQuery(
         name="Member.findByUsername",
         query="select m from Member m where m.username = :username"
-)
+)*/
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본생성자 필수 필요. private  X, proxy 관련때문에
 @Getter @Setter  // setter는 만들지 말자
 @ToString(of ={"id", "username", "age", "address"}) // team 쓰면안됨.. 연관관계필드는 출력 주의
