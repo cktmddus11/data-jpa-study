@@ -27,7 +27,7 @@ public class Member {
     private Address address;
 
 
-    @ManyToOne  // (fetch = FetchType.LAZY)
+    @ManyToOne  (fetch = FetchType.LAZY)
     @JoinColumn(name="team_id")
     private Team team;  //외래키 보관, 연관관계 주인
 

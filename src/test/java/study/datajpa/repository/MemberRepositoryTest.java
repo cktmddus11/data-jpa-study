@@ -351,7 +351,9 @@ class MemberRepositoryTest {
         // PageRequest of(int pageNumber, int pageSize, Sort sort)
         PageRequest pageRequest =   // 페이지는 0번부터 시작
                 PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
-        Page<Member> page = memberRepository.findByUsername("memberA", pageRequest);
+        // Page<Member> page = memberRepository.findByUsername("memberA", pageRequest);
+        Page<Member> page = memberRepository.findMemberNotLeftJoin(
+                pageRequest);
 
         Page<MemberDto> dtoPage = page.map(m -> new MemberDto(m.getId(), m.getUsername(), m.getTeam().getName()));
         List<MemberDto> content = dtoPage.getContent(); //조회된 데이터
@@ -386,5 +388,7 @@ class MemberRepositoryTest {
         memberRepository.save(member3);
         memberRepository.save(member4);
         memberRepository.save(member5);
+
+
     }
 }

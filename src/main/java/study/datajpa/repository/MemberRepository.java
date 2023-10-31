@@ -59,7 +59,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Page<Member> findMemberAllCountBy(Pageable pageable);
 
 
-
+    @Query(value="select m from Member m" +
+            "left join m.team t",
+            countQuery = "select count(m.username) from Member m")
+    Page<Member> findMemberNotLeftJoin (Pageable pageable);
 
 }
 
