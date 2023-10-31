@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
@@ -59,11 +60,17 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Page<Member> findMemberAllCountBy(Pageable pageable);
 
 
-    @Query(value="select m from Member m" +
+    @Query(value="select m from Member m " +
             "left join m.team t",
             countQuery = "select count(m.username) from Member m")
     Page<Member> findMemberNotLeftJoin (Pageable pageable);
 
+
+    // 스프링 데이터 JPA사용한 벌크성 수정쿼리
+    @Modifying(clearAutomatically = true) //수정 삭제 쿼리는 어노테이션 필수
+    @Query("update Member m set m.age = m.age + 1 " +
+            "where m.age >= :age")
+    int bulkAgePlus(@Param("age") int age);
 }
 
 

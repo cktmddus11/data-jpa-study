@@ -1,5 +1,6 @@
 package study.datajpa.repository;
 
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ class MemberRepositoryTest {
 
     @Autowired
     TeamRepository teamRepository;
+
+    @Autowired
+    EntityManager em;
 
     @Test
     public void testMemer() {
@@ -352,8 +356,7 @@ class MemberRepositoryTest {
         PageRequest pageRequest =   // 페이지는 0번부터 시작
                 PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
         // Page<Member> page = memberRepository.findByUsername("memberA", pageRequest);
-        Page<Member> page = memberRepository.findMemberNotLeftJoin(
-                pageRequest);
+        Page<Member> page = memberRepository.findMemberNotLeftJoin(pageRequest);
 
         Page<MemberDto> dtoPage = page.map(m -> new MemberDto(m.getId(), m.getUsername(), m.getTeam().getName()));
         List<MemberDto> content = dtoPage.getContent(); //조회된 데이터
@@ -390,5 +393,42 @@ class MemberRepositoryTest {
         memberRepository.save(member5);
 
 
+    }
+
+    @Test
+    void bulkAgePlus() {
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        int resultCount = memberRepository.bulkAgePlus(18);
+
+        Assertions.assertThat(resultCount).isEqualTo(4);
+
+        List<Member> memberList = memberRepository.findAll(); // 벌크성 쿼리는 영속성 컨텍스트에 반영되지 않는다.
+        for (Member m : memberList) {
+            System.out.println("member = " + m);
+        }
+    }
+    @Test
+    void bulkAgePlus2() {
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        int resultCount = memberRepository.bulkAgePlus(18);
+       // em.flush(); // 쿼리저장소에 날릴 쿼리가 있으면 날리는데 없어서 필요 없는듯?
+       // em.clear();// 영속성 컨텍스트 비움.
+
+        Assertions.assertThat(resultCount).isEqualTo(4);
+
+        List<Member> memberList = memberRepository.findAll(); // 벌크성 쿼리는 영속성 컨텍스트에 반영되지 않는다.
+        for (Member m : memberList) {
+            System.out.println("member = " + m);
+        }
     }
 }
