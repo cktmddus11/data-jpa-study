@@ -1,7 +1,11 @@
 package study.datajpa.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceUnitUtil;
+import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
+import org.hibernate.Hibernate;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -431,4 +435,47 @@ class MemberRepositoryTest {
             System.out.println("member = " + m);
         }
     }
+
+    @Test
+    @DisplayName("findMemberLazy")
+    public void findMemberLazy()  {
+        //  팀과 회원은 지연로딩 관계이기 때문에 회원하나당 팀을 조회하는 N+1 문제가 발생함.
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        memberRepository.save(new Member("member1", 10, teamA));
+        memberRepository.save(new Member("member2", 20, teamB));
+
+        em.flush();
+        em.clear();
+
+        List<Member> memberList = memberRepository.findAll();
+        for (Member member : memberList) {
+            System.out.println("member.team = " + member.getTeam().getName());
+
+            // Hibernate 기능으로 확인
+            boolean initialized = Hibernate.isInitialized(member.getTeam()); // 초기화 되어있으면 true
+            Assertions.assertThat(initialized).isTrue();
+
+            boolean isTeamInitialized = Hibernate.isPropertyInitialized(member, "team");
+            Assertions.assertThat(isTeamInitialized).isTrue();
+
+
+            PersistenceUnitUtil util = em.getEntityManagerFactory().getPersistenceUnitUtil();
+            util.isLoaded(member.getTeam());
+
+        }
+
+
+
+    }
+
+
+
+
+
+
+
+
 }
