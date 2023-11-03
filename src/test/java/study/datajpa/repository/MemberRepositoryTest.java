@@ -2,6 +2,8 @@ package study.datajpa.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceUnitUtil;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.hibernate.Hibernate;
@@ -21,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-
+@Slf4j
 @Rollback(false)
 @Transactional
 @SpringBootTest
@@ -472,9 +474,49 @@ class MemberRepositoryTest {
     }
 
 
+    @Test
+    void entityGraphTest() {
+        makeTeamAndMember();
+
+        Member member6 = new Member("memberA", 10, (Team) null);
+        memberRepository.save(member6);
+
+        log.info("findMember = {}", memberRepository.findById(member6.getId()));
+
+        em.flush();
+        em.clear();
 
 
+        log.info("======================= findAll =======================");
+        List<Member> memberList = memberRepository.findAll();
+        for (Member m : memberList) {
+            log.info("member = {}", m);
+        }
 
+        log.info("======================= findMemberEntityGraph =======================");
+        List<Member> memberList2 = memberRepository.findMemberEntityGraph();
+        for (Member m : memberList2) {
+            log.info("member = {}", m);
+        }
+
+        log.info("======================= findMemberEntityGraph =======================");
+        List<Member> memberList3 = memberRepository.findMemberEntityGraph();
+        for (Member m : memberList3) {
+            log.info("member = {}", m);
+        }
+
+
+        log.info("======================= findMemberEntityGrap2 =======================");
+        List<Member> memberList4 = memberRepository.findMemberEntityGrap2();
+        for (Member m : memberList4) {
+            log.info("member = {}", m);
+        }
+
+        log.info("======================= entityManager  =======================");
+        for (Member m : memberList4) {
+            log.info("member = {}", memberRepository.findById(m.getId()));
+        }
+    }
 
 
 
