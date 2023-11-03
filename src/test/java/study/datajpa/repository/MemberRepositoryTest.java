@@ -388,10 +388,10 @@ class MemberRepositoryTest {
 
 
         Member member1 = new Member("memberA", 10, team);
-        Member member2 = new Member("memberA", 10, team2);
-        Member member3 = new Member("memberA", 1, team3);
-        Member member4 = new Member("memberA", 1, team4);
-        Member member5 = new Member("memberA", 10, team5);
+        Member member2 = new Member("memberB", 10, team2);
+        Member member3 = new Member("memberC", 1, team3);
+        Member member4 = new Member("memberD", 1, team4);
+        Member member5 = new Member("memberE", 10, team5);
         memberRepository.save(member1);
         memberRepository.save(member2);
         memberRepository.save(member3);
@@ -519,5 +519,27 @@ class MemberRepositoryTest {
     }
 
 
+    @Test
+    void queryHint() {
+        makeTeamAndMember();
+        em.flush();
+        em.clear();
 
+        Member findMemberForUpdate = memberRepository.findByUsername("memberB").get(0);
+        findMemberForUpdate.setAge(20);
+
+        Member findReadOnlyMember = memberRepository.findReadOnlyByUsername("memberB");
+        findReadOnlyMember.setAge(10);
+
+        //given
+       /* memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+        //when
+        Member member = memberRepository.findReadOnlyByUsername("member1");
+        member.setUsername("member2");
+        em.flush(); //Update Query 실행X*/
+
+
+    }
 }

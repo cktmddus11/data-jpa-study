@@ -1,12 +1,11 @@
 package study.datajpa.repository;
 
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
@@ -51,20 +50,20 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findMembeByUsernameList(@Param("names") List<String> userNameList);
 
 
-    Page<Member> findByUsername( String name, Pageable pageable);
+    Page<Member> findByUsername(String name, Pageable pageable);
 
     Slice<Member> findMemberByUsername(String name, Pageable pageable);
 
 
-    @Query(value="select m from Member m",
+    @Query(value = "select m from Member m",
             countQuery = "select count(m.username) from Member m")
     Page<Member> findMemberAllCountBy(Pageable pageable);
 
 
-    @Query(value="select m from Member m " +
+    @Query(value = "select m from Member m " +
             "left join m.team t",
             countQuery = "select count(m.username) from Member m")
-    Page<Member> findMemberNotLeftJoin (Pageable pageable);
+    Page<Member> findMemberNotLeftJoin(Pageable pageable);
 
 
     // 스프링 데이터 JPA사용한 벌크성 수정쿼리
@@ -75,7 +74,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 
     // EntityGraph
-    
+
     // 공통 메서드 오버라이드
     @Override
     @EntityGraph(attributePaths = {"team"})
@@ -96,7 +95,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findMemberEntityGrap2();
 
 
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+    Member findReadOnlyByUsername(String username);
 
+
+    @QueryHints(value = {
+            @QueryHint(name = "org.hibernate.readOnly", value = "true")
+             }
+            , forCounting = true)
+    Page<Member> findByUsernameUseHint(String name, Pageable pageable);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE) // 비관적락 => 성능저하에 주의
+                                            // 쓰기락. 해당 메소드가 실행되는 동안 엔티티에 쓰기락 걸림.
+    List<Member> findByUsernameLockMode(String name); // 다수의 트랜젝션 동시에 수정하는 경우 데이터 무결성 방지 
 
 
 }
