@@ -542,4 +542,12 @@ class MemberRepositoryTest {
 
 
     }
+
+    @Test
+    public void customMethodCallTest(){
+        List<Member> memberList = memberRepository.findMemberCustom();
+        for (Member m : memberList) {
+            System.out.println("member = " + m);
+        }
+    }
 }
