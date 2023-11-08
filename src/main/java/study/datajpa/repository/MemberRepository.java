@@ -103,11 +103,11 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
             @QueryHint(name = "org.hibernate.readOnly", value = "true")
              }
             , forCounting = true)
-    Page<Member> findByUsernameUseHint(String name, Pageable pageable);
+    Page<Member> findMemberUseHintByUsername(String name, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE) // 비관적락 => 성능저하에 주의
                                             // 쓰기락. 해당 메소드가 실행되는 동안 엔티티에 쓰기락 걸림.
-    List<Member> findByUsernameLockMode(String name); // 다수의 트랜젝션 동시에 수정하는 경우 데이터 무결성 방지 
+    List<Member> findMemberUseLockByUsername(String name); // 다수의 트랜젝션 동시에 수정하는 경우 데이터 무결성 방지
 
 
 }
